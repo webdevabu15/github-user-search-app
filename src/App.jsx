@@ -1,28 +1,27 @@
-import { useEffect, useState } from 'react'
+import { useRef, useState } from 'react'
 import './App.css'
 
 function App() {
-  const [user,setUser] = useState('webdevabu15')
   const [userData, setUserData] = useState({})
   const [error, setError] = useState()
-
-   async function getUser() {
-      try{
-        if(!user.trim()) return
-        setError("")
-         const response = await fetch(`https://api.github.com/users/${user}`) 
-         if(!response.ok){
-          throw new Error("User not found")
-         }
-         const data = await response.json()
-         setUserData(data)
+  const oldTimer = useRef(null)
+  async function getUser(user) {
+    try {
+      if (!user.trim()) return
+      setError("")
+      const response = await fetch(`https://api.github.com/users/${user}`)
+      if (!response.ok) {
+        throw new Error("User not found")
       }
-      catch(error){
-        setError(error.message)
-      }
+      const data = await response.json()
+      setUserData(data)
     }
+    catch (error) {
+      setError(error.message)
+    }
+  }
 
-  
+
 
   return (
     <div className="min-h-screen bg-[#0d1117] flex items-center justify-center p-5">
@@ -36,15 +35,15 @@ function App() {
             type="text"
             placeholder="Search github username..."
             className="flex-1 bg-[#0d1117] border border-[#30363d] rounded-2xl px-4 py-3 text-white outline-none focus:border-blue-500"
-            onChange={(e) => setUser(e.target.value)}
+            onChange={(e) => {
+              const value = e.target.value;
+              clearTimeout(oldTimer.current);
+              oldTimer.current = setTimeout(() => {
+                getUser(value)
+              }, 300)
+            }}
           />
 
-          <button 
-           onClick={() => getUser()}
-           className="bg-blue-600 hover:bg-blue-700 transition px-5 rounded-2xl text-white font-semibold"
-          >
-            Search
-          </button>
         </div>
         <div className="bg-[#0d1117] border border-[#30363d] rounded-3xl p-6">
 
@@ -57,9 +56,8 @@ function App() {
           </div>
 
           <div className="text-center">
-            <h2 className="text-white text-2xl font-bold">
-              {userData.name || error}
-            </h2>
+            <h2 className='text-white'>Name: {userData.name}</h2>
+            {error && <p className="text-red-500 text-sm">{error}</p>}
 
             <p className="text-blue-400 mb-3">
               Login: {userData.login}
@@ -101,8 +99,8 @@ function App() {
 
           </div>
 
-          <a 
-            href={userData.html_url} 
+          <a
+            href={userData.html_url}
             target="_blank"
             className="w-full mt-6 bg-white text-black py-3 rounded-2xl font-semibold hover:scale-[1.02] transition block text-center"
           >
