@@ -3,7 +3,7 @@
 A sleek and responsive GitHub user search application built with React and Tailwind CSS.
 
 ## Live Demo
-> Coming soon...
+<a href="https://github-user-search-app-rho-ten.vercel.app/">Demo</a>
 
 ## Features
 
